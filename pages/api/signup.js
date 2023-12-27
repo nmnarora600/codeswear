@@ -10,20 +10,36 @@ const Signup= async(req, res)=>{
                 res.status(409).json({error:"User Already Exists"})
             }
             else{
-                let {name, email, password}=req.body;
+                let {name, email, password,type}=req.body;
                 var encryptedpass='';
                 
                 let saltRounds=parseInt(process.env.saltRounds);
                 // let hash=process.env.hash
                 encryptedpass= await bcrypt.hash(password,saltRounds )
-                let u= new User({"name":name,"email": email,"password":encryptedpass });
+                let u= new User({"name":name,"email": email,"password":encryptedpass , type:"normal"});
                     await u.save();
-                    res.status(200).json({ success: "true" });
+
+                    let logresp={};
+                        let x = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/login`, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({email, password}),
+                      });
+                       logresp=await x.json();
+                      if(logresp.token){
+
+                          return res.status(200).json({ success: "true" , token:logresp.token});
+                      }
+                      else{
+                        return res.status(200).json({ success: "true" , error:'Account Created kindly login yourself.'});
+                      }
             
             }
           
         } catch (error) {
-            
+          
             res.status(500).json({error:"INTERNAL SERVER ERROR"})
         }
         

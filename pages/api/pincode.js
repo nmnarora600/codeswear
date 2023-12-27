@@ -1,3 +1,6 @@
+import pincode from '../../pincodes.json'
 export default function handler(req,res){
-    res.status(200).json([263152,110023,324005,264195,700001])
+
+    
+    res.status(200).json(pincode)
 }

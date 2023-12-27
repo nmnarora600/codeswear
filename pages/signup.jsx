@@ -3,6 +3,7 @@ import Link from "next/link";
 import Router, { useRouter } from 'next/router';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Head from "next/head";
 
 
 const Signup = ({isLogged, hostname}) => {
@@ -37,17 +38,23 @@ const router=useRouter();
 
        
             
-            if (u.ok) {
-              // console.log("saved to db");
+            if (res.token) {
+              
               resolve("Account created successfully!");
+            
               localStorage.setItem('token', res.token);
               setTimeout(() => {
               
                 Router.push(`/`)
               }, 1000);
             } else {
-            
+           
+
               reject( res.error);
+              if(res.success){
+                router.push('/login')
+              }
+            
             }
           } catch (error) {
             reject(res.error);
@@ -68,7 +75,9 @@ const router=useRouter();
             render: ({data})=>data, // Display the error message
             // Use an error icon
             theme: "colored",
+            
           },
+         
         }
       );
     } catch (error) {
@@ -81,7 +90,7 @@ const router=useRouter();
   return (
     <>
     {(!isLogged)&&
-    <div>
+    <div className="min-h-screen">
     
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -94,7 +103,9 @@ const router=useRouter();
             Create an Account
           </h2>
         </div>
-
+<Head>
+  <title>Sign up - Codeswear.com</title>
+</Head>
         <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
           <form
             onSubmit={handleSubmit}
@@ -119,7 +130,7 @@ const router=useRouter();
                   }}
                   type="text"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-pink-600 focus:outline-none sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -141,7 +152,7 @@ const router=useRouter();
                   }}
                   autoComplete="email"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:outline-none focus:ring-pink-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -166,7 +177,7 @@ const router=useRouter();
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:outline-none focus:ring-pink-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>

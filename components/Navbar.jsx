@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AiOutlineShoppingCart,
   AiFillCloseCircle,
@@ -13,11 +14,58 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = ({user, cart,logout, addToCart, removeFromCart, clearCart, subTotal, shift, setShift}) => {
-  // console.log(cart, addToCart, removeFromCart, clearCart, subTotal)
 
+const router=useRouter();
   const [dropdown, setDropdown] = useState(false)
-const handleLogout=()=>{logout();
-  setDropdown(false);
+  const [usermail, setUsermail]=useState('');
+  const [username, setUsername]=useState('');
+  const [admin, setAdmin]=useState(false);
+
+let userdata={};
+
+  useEffect(()=>{
+    setShift(false)
+const datafetcher=async()=>{
+if(localStorage.getItem('token')){
+
+
+  let data={token:localStorage.getItem('token')};
+
+let u=await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/getlogged`,{
+  method:"POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(data),
+});
+let resp=await u.json();
+if(resp.error){
+
+logout();
+}
+else if(resp.notfound){
+ logout();
+}
+else{
+  setUsermail(resp.email);
+  setUsername(resp.name);
+  if(resp.type=='admin'){
+    setAdmin(true);
+  }
+}
+}
+
+}
+datafetcher();
+
+
+  },[localStorage])
+
+const handleLogout=()=>{
+  
+
+
+ setDropdown(false);
   
   toast.success('Successfully Logged out !', {
     position: "top-left",
@@ -28,25 +76,43 @@ const handleLogout=()=>{logout();
     draggable: true,
     progress: undefined,
     theme: "light",
-    });
+  });
+  setTimeout(() => {
+    logout();
+  },1000);
 }
   const toggleDropdown=()=>{
     setDropdown(!dropdown)
     
   }
   const toggleCart = () => {
-    if (ref.current.classList.contains("translate-x-full")) {
-      ref.current.classList.remove("translate-x-full");
-      ref.current.classList.add("translate-x-0");
-    } else {
-      ref.current.classList.remove("translate-x-0");
-      ref.current.classList.add("translate-x-full");
-    }
-    setShift(false)
+    // if (ref.current.classList.contains("translate-x-full")) {
+    //   ref.current.classList.remove("translate-x-full");
+    //   ref.current.classList.add("translate-x-0");
+    // } else {
+    //   ref.current.classList.remove("translate-x-0");
+    //   ref.current.classList.add("translate-x-full");
+    // }
+    setShift(!shift)
   };
   const ref = useRef();
+  // let currpath=router.pathname;
   return (
-    <div className="flex flex-col md:flex-row md:justify-start justify-center sticky top-0 z-10 bg-white items-center mb-1 shadow-md">
+    <>
+    {dropdown && <div className="absolute ">
+     <div className="fixed right-14 z-40 bg-white  shadow-lg border  top-9 rounded-md px-5 py-4 w-36"   onMouseOver={() => setDropdown(true)}
+      onMouseLeave={() => setDropdown(false)} >
+            <ul>
+              <li className="py-1  text-sm font-semibold ">Hello, {(localStorage.getItem('token'))?username.split(' ')[0]:"User"}</li>
+              <hr className="border border-pink-500"/>
+            {admin && <Link href={'/admin'}><li className="py-1  text-sm hover:text-pink-500 ">View Dashboard</li></Link>}
+              <Link href={'/myaccount'}><li className="py-1  text-sm hover:text-pink-500 ">My Account</li></Link>
+              <Link href={`/orders?email=${ encodeURIComponent(usermail)}` } passHref><li className="py-1  text-sm hover:text-pink-500 ">My Orders</li></Link>
+              <Link href={'#'} onClick={handleLogout}><li className="py-1 text-sm hover:text-pink-500 ">Logout</li></Link>
+            </ul>
+            </div>
+            </div>}
+    <div className={`flex flex-col md:flex-row md:justify-start justify-center sticky top-0 z-10 bg-white items-center mb-1 shadow-md ${!shift && 'overflow-hidden'}`}>
       <ToastContainer
 position="top-left"
 autoClose={501}
@@ -59,6 +125,7 @@ draggable
 pauseOnHover
 theme="light"
 />
+
         <div className="logo mr-auto md:mx-5">
       <Link href={"/"} >
           <Image src={"/logo.png"} className=" mr-auto" alt="" width={200} height={40} />
@@ -90,23 +157,16 @@ theme="light"
       >
         <div onMouseOver={() => setDropdown(true)}
       onMouseLeave={() => setDropdown(false)} >
-          {dropdown && <div className="absolute right-8 bg-white shadow-lg border  top-6 rounded-md px-5 py-4 w-32"   onMouseOver={() => setDropdown(true)}
-      onMouseLeave={() => setDropdown(false)} >
-            <ul>
-              <Link href={'/myaccount'}><li className="py-1  text-sm hover:text-pink-500 ">My Account</li></Link>
-              <Link href={'/orders'}><li className="py-1  text-sm hover:text-pink-500 ">Orders</li></Link>
-              <Link href={''} onClick={handleLogout}><li className="py-1 text-sm hover:text-pink-500 ">Logout</li></Link>
-            </ul>
-            </div>} 
+           
         {user.value && <MdAccountCircle  className="text-xl md:text-2xl mx-2"/>}
         </div>
 
-        {!user.value && <Link href={'/login'}><button className="flex text-white bg-pink-600 py-1 px-2 text-sm mx-2 hover:bg-pink-600 rounded "> Login </button></Link>}
+        {!user.value && <Link href={'/login'} key={localStorage.getItem('token')} ><button  className="flex text-white bg-pink-600 py-1 px-2 text-sm mx-2 hover:bg-pink-600 rounded "> Login </button></Link>}
         <AiOutlineShoppingCart onClick={toggleCart} className="text-xl md:text-2xl " />
       </div>
       <div
         ref={ref}
-        className={`w-72 h-[100vh] sidecart overflow-y-scroll bg-pink-100 absolute top-0 right-0 py-10 px-8 transition-transform ${(Object.keys(cart).length ===0 || shift!==true ) ? "translate-x-full": "translate-x-0" } transform`}
+        className={`w-60 md:w-72 h-[100vh] sidecart overflow-y-scroll bg-pink-100 absolute top-0  py-10 px-8 transition-all ${( shift!==true ) ? "-right-96": "right-0" } `}
       >
         <h2 className="font-bold text-xl text-center">Shopping Cart</h2>
         <span
@@ -148,16 +208,17 @@ theme="light"
           <div className="total font-bold text-2xl mb-3">Total: ₹{Math.round((subTotal)*100)/100}</div>
 
         <div className="flex">
-         <Link href={'/checkout'}><button className="flex mr-2 text-white bg-pink-500 border-0 py-2 px-2 focus:outline-none hover:bg-pink-600 rounded text-sm">
+         <Link href={'/checkout'} onClick={toggleCart}><button disabled={Object.keys(cart).length===0} className="flex mr-2 text-white bg-pink-500 border-0 py-2 px-2 focus:outline-none hover:bg-pink-600 disabled:bg-pink-300 rounded text-sm">
             <BsFillBagCheckFill className="m-1" /> Checkout
           </button>
           </Link>
-          <button onClick={clearCart} className="flex mr-2 text-white bg-pink-500 border-0 py-2 px-2 focus:outline-none hover:bg-pink-600 rounded text-sm">
+          <button onClick={clearCart} disabled={Object.keys(cart).length===0}  className="flex mr-2 disabled:bg-pink-300 text-white bg-pink-500 border-0 py-2 px-2 focus:outline-none hover:bg-pink-600 rounded text-sm">
             Clear Cart
           </button>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

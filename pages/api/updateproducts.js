@@ -5,15 +5,29 @@ import Connectdb from '@/middleware/mongoose'
 const UpdateProduct= async(req, res)=>{
     if(req.method=='POST'){
         try {
-            for(let i=0;i<req.body.length;i++){
+           let form=req.body;
+           if(   form.availableQty==''||
+    form.title==''||
+    form.color==''||
+    form.size==''||
+    form.price==''||
+    form.category==''||
+    form.desc==''||
+    form.img==''||
+    form.slug==''){
+        throw "All fields are required"
+    }
+    let a=form.color.toLowerCase();
+    form.color=a;
 
-        
-                let p =await Product.findByIdAndUpdate(req.body[i]._id, req.body[i])
-                console.log(p)
-            }
+     
+                let p =await Product.findOneAndUpdate({slug:req.body.slug}, req.body)
+           
+            
                res.status(200).json({success:"updated"})
             
         } catch (error) {
+         
             res.status(500).json({error:"INTERNAL SERVER ERROR"})
         }
         
@@ -23,4 +37,4 @@ const UpdateProduct= async(req, res)=>{
     }
     
 }
-export default UpdateProduct;
+export default Connectdb(UpdateProduct);

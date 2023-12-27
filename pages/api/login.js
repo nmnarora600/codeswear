@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 
 const Login = async (req, res) => {
-  
+
   if (req.method == "POST") {
     try {
       let user = await User.findOne({ email: req.body.email });
@@ -14,8 +14,12 @@ const Login = async (req, res) => {
         const match = await bcrypt.compare(req.body.password, user.password);
 
         if (match && user.email === req.body.email) {
-         let token= jwt.sign({  name: user.name, email: user.email }, 'shhhhhhhh', { expiresIn: '1d' })
-          res.status(200).json({success: "true",token });
+         let token= jwt.sign({  name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' })
+         if(req.body.cart){
+
+           await User.findByIdAndUpdate(user._id,{cart:JSON.parse(req.body.cart)})
+         }
+          res.status(200).json({success: "true",token ,cart:user.cart});
         } else {
           res
             .status(401)

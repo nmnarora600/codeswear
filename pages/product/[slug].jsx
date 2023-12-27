@@ -1,22 +1,26 @@
 import Product from "@/models/Product";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import mongoose from "mongoose";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Error from "next/error";
 
-const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
+const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname, error}) => {
+
+ 
   const router = useRouter();
   const { slug } = router.query;
-
+  const [color, setColor] = useState();
+  const [size, setSize] = useState();
   const [pin, setpin] = useState("");
   const [service, setService] = useState();
   const checkService = async () => {
     let pins = await fetch(`${hostname}/api/pincode`);
     let pinJson = await pins.json();
 
-    if (pinJson.includes(parseInt(pin))) {
+    if (Object.keys(pinJson).includes((pin))) {
       setService(true);
       toast.success("Your Pincode is serviceable", {
         position: "bottom-center",
@@ -39,36 +43,41 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
         theme: "light",
       });
     }
-    // console.log(service);
-    // console.log(pin)
+    
   };
   const onChangePin = (e) => {
     setpin(e.target.value);
   };
+useEffect(() => {
+  if(error!=404){
+  
+    setColor(product.color);
+    setSize(product.size);
+  }
+}, [router.query])
 
-  const [color, setColor] = useState(product.color);
-  const [size, setSize] = useState(product.size);
+
 
   const refreshVariant = (newcolor, newsize) => {
-    // console.log(newcolor, newsize)
+    
     let href = `${hostname}/product/${variants[newcolor][newsize]["slug"]}`;
-    window.location = href;
+   
+    // window.location = href;
+    if(href){
+
+      router.replace(href)
+    }
+    else{
+     
+    }
   };
- 
+  if(error==404){
+    return <Error statusCode={error}/>
+   }
   return (
     <>
       <section className="text-gray-600 body-font overflow-hidden">
-        <ToastContainer
-          position="bottom-center"
-          autoClose={1000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+        
         <div className="container px-5 py-16 mx-auto">
           <div className="lg:w-4/5 mx-auto flex flex-wrap">
             <Image
@@ -76,7 +85,7 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
               width={400}
               height={300}
               className="lg:w-1/2 w-full lg:h-auto px-24 object-contain object-top rounded"
-              src={`https://${product.img}`}
+              src={`${product.img.includes('uploads')?product.img:`https://${product.img}`}`}
             />
             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
               <h2 className="text-sm title-font text-gray-500 tracking-widest">
@@ -85,7 +94,7 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
               <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">{`${
                 product.title
               } (${size}/${
-                color.charAt(0).toUpperCase() + color.slice(1)
+                color &&(color.charAt(0).toUpperCase() + color.slice(1))
               })`}</h1>
 
               <div className="flex mb-4">
@@ -127,9 +136,9 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
               </div>
 
               <p className="leading-relaxed">{product.desc}</p>
-              <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5">
-                <div className="flex">
-                  <span className="mr-3">Color</span>
+              <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5 content-between">
+                <div className="flex flex-wrap">
+                  <span className="mr-3">Available Colors: </span>
 
                   {Object.keys(variants).map((item, index) => {
                   
@@ -141,23 +150,24 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
                           }}
                           key={index}
                           
-                          className={`border-2 colorbutton ml-1 ${item==='black'?('bg-'+item):('bg-'+item+'-500')} rounded-full w-6 h-6 focus:outline-none ${
+                          className={`border-2 colorbutton ml-1 rounded-full w-6 h-6 focus:outline-none ${
                             color === item ? "border-black" : "border-gray-300"
-                          }`}
+                          }`} style={{backgroundColor:item}}
                         ></button>
                       )
                     );
                   })}
                 </div>
                 <div className="flex ml-6 items-center">
-                  <span className="mr-3">Size</span>
+                  <span className="mr-3">Available Sizes: </span>
                   <div className="relative">
                     <select
                       onChange={(e) => refreshVariant(color, e.target.value)}
                       className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-500 text-base pl-3 pr-10"
                       defaultValue={size}
+                      key={size}
                     >
-                      {Object.keys(variants[color]).map((item, index) => {
+                      {color && Object.keys(variants[color]).map((item, index) => {
                         return (
                           <option key={index} value={item}>
                             {item}
@@ -181,12 +191,23 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
                   </div>
                 </div>
               </div>
-                 {parseInt(SALE)===1 && <h4 className="bg-pink-400 text-white w-1/5 text-center">SALE PRICE</h4>}
-                <div className="title-font font-medium text-3xl mb-2 text-gray-900">
-               {parseInt(SALE)===1 && <strike className="text-gray-400 text-xl"> ₹{Math.round(product.price*1.3)}</strike>}  ₹{product.price}
-                </div>
+             
+              
+              
+             
+              
+             { ((product.availableQty>0) && parseInt(SALE)===1 )&& <h4 className="bg-pink-400 text-white md:w-1/5 w-1/3 text-center">SALE PRICE</h4>}
+
+             {(product.availableQty>0) && <div className="title-font font-medium text-3xl mb-2 text-gray-900">
+               {( parseInt(SALE)===1 ) && <strike className="text-gray-400 text-xl"> ₹{Math.round(product.price*1.3)}</strike>}  ₹{product.price}
+                </div>}
+                {(product.availableQty<=0) && <div className="title-font font-medium md:text-3xl text-xl mb-2  text-gray-800">
+              Out of Stock
+                </div>}
               <div className="flex ">
+              
                 <button
+                disabled={product.availableQty<=0}
                   onClick={() => {
                     buyNow(
                       slug,
@@ -199,11 +220,12 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
                       color.charAt(0).toUpperCase() + color.slice(1)
                     );
                   }}
-                  className="flex text-white bg-pink-500 border-0 py-2 mt-3 pr-1 md:px-3 text-sm focus:outline-none hover:bg-pink-600 rounded h-1/5 buybutton"
+                  className="flex text-white disabled:bg-pink-300 bg-pink-500 border-0 py-2 mt-3 pr-1 md:px-3 text-sm focus:outline-none hover:bg-pink-600 rounded h-1/5 buybutton"
                 >
                   Buy Now
                 </button>
                 <button
+                disabled={product.availableQty<=0}
                   onClick={() => {
                     addToCart(
                       slug,
@@ -216,7 +238,7 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
                       color.charAt(0).toUpperCase() + color.slice(1)
                     );
                   }}
-                  className="flex ml-4 mt-3 h-1/5 text-white bg-pink-500 border-0 py-2 px-1 md:px-3 text-sm focus:outline-none hover:bg-pink-600 rounded"
+                  className="flex ml-4 mt-3 h-1/5 disabled:bg-pink-300 text-white bg-pink-500 border-0 py-2 px-1 md:px-3 text-sm focus:outline-none hover:bg-pink-600 rounded"
                 >
                   Add to cart
                 </button>
@@ -230,7 +252,7 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
                 <input
                   type="text"
                   onChange={onChangePin}
-                  className="px-2 border-2 border-gray-400 rounded-md"
+                  className="px-2 border-2 border-gray-400 focus:outline-none focus:border-pink-500   rounded-md"
                   placeholder="Enter your Pincode"
                 />
                 <button
@@ -260,11 +282,27 @@ const Slug = ({ addToCart, product, variants, buyNow, SALE, hostname }) => {
 };
 
 export async function getServerSideProps(context) {
-  if (!mongoose.connections[0].readyState) {
-    await mongoose.connect(process.env.MONGO_URI);
+  if (mongoose.connections[0].readyState) {
+  
   }
+  else{
+    await mongoose.connect(process.env.MONGO_URI);
 
-  let product = await Product.findOne({ slug: context.query.slug });
+  }
+  
+let {slug}=context.query
+
+  let product = await Product.findOne({ slug });
+  
+  
+  if(product==null){
+    return {
+      props: {
+        error:404
+      },
+    };
+  }
+ 
   let variants = await Product.find({ title: product.title, category:product.category });
   let colorSizeSlug = {};
   //{red:{xl:{slug: wear-the-code}}}
@@ -277,6 +315,7 @@ export async function getServerSideProps(context) {
     }
   }
 let sale=process.env.SALE
+
   return {
     props: {
       variants: JSON.parse(JSON.stringify(colorSizeSlug)),
