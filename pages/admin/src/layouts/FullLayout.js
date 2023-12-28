@@ -31,7 +31,7 @@ const PageWrapper = experimentalStyled("div")(({ theme }) => ({
 }));
 
 const FullLayout = ({ children,logout, anymsg }) => {
-
+ 
   const [isSidebarOpen, setSidebarOpen] = React.useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -44,6 +44,7 @@ const FullLayout = ({ children,logout, anymsg }) => {
         }}
         toggleMobileSidebar={() => setMobileSidebarOpen(true)}
         logout={logout}
+        anymsg={anymsg}
         
       />
       

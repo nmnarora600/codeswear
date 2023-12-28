@@ -22,6 +22,9 @@ export default function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const getmail = async () => {
       let c = localStorage.getItem("token");
+      if(c){
+
+      
       let u = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/getlogged`, {
         method: "POST",
         headers: {
@@ -34,7 +37,7 @@ export default function MyApp({ Component, pageProps }) {
         setMail(resp.email);
      
       }
-    };
+    };}
     getmail();
   }, [isLogged]);
 
@@ -66,7 +69,7 @@ export default function MyApp({ Component, pageProps }) {
     }
   }, [router.route]);
   const logout = async () => {
-
+    console.log("logging out")
     localStorage.removeItem("token");
     setUser({ value: null });
     setIsLogged(false);
@@ -74,7 +77,7 @@ export default function MyApp({ Component, pageProps }) {
     await router.replace("/");
   };
 const anymsg=()=>{
-
+console.log("i am anymsg")
 }
   const saveCarttoserver = async () => {
   
@@ -195,7 +198,7 @@ const anymsg=()=>{
           cart={cart}
           buyNow={buyNow}
           logout={logout}
-          
+          anymsg={anymsg}
           addToCart={addToCart}
           removeFromCart={removeFromCart}
           clearCart={clearCart}

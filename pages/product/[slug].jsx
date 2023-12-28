@@ -135,7 +135,7 @@ useEffect(() => {
           </span> */}
               </div>
 
-              <p className="leading-relaxed">{product.desc}</p>
+              <p className="leading-relaxed" dangerouslySetInnerHTML={{__html:product.desc}}></p>
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5 content-between">
                 <div className="flex flex-wrap">
                   <span className="mr-3">Available Colors: </span>

@@ -6,15 +6,19 @@ const Signup= async(req, res)=>{
     if(req.method=='POST'){
         try {
             let sus=await User.find({type:'admin'})
-            if(sus){
+            if(sus.length !== 0){
+                console.log(sus)
                 res.status(409).json({error:"An Administrator is already Associated"})
+                return;
             }
             let check= await User.findOne({email:req.body.email})
             if(check){
                 res.status(409).json({error:"User Already Exists"})
+                return;
             }
-            if(req.body.actcode!=process.env.ACTIVATION){
+            if(req.body.actcode!=process.env.NEXT_PUBLIC_ACTIVATION){
                 res.status(409).json({error:"Unauthorized Attempt"})
+                return;
             }
             else{
                 let {name, email, password,actcode}=req.body;

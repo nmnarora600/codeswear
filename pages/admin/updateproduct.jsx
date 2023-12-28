@@ -61,6 +61,12 @@ const [show, setShow]=useState(false);
       });
       return
     }
+    if (form && form.desc) {
+      let formattedText = form.desc
+        .replace(/\n/g, "<br/>")
+        .replace(/  /g, "&nbsp;&nbsp;");
+      form.desc = formattedText;
+    }
     let u = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/updateproducts`, {
       method: "POST",
       headers: {

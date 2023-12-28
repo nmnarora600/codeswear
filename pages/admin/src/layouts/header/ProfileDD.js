@@ -12,12 +12,22 @@ import {
   
 } from "@mui/material";
 import { useRouter } from "next/router";
-const ProfileDD = ({user,logout}) => {
-
+const ProfileDD = ({user,logout, anymsg}) => {
+ 
  const[show, setShow]=useState(false);
-  const [hovered, setHovered] = useState(false);
-
-  const router=useRouter();
+ const [hovered, setHovered] = useState(false);
+ const router=useRouter();
+const trial=()=>{
+  if(typeof logout==='function'){
+    logout();
+    anymsg();
+  }
+else{
+  
+  localStorage.removeItem('token')
+  router.replace('/')
+}
+}
   return (
     <>
       <Button
@@ -78,7 +88,7 @@ const ProfileDD = ({user,logout}) => {
   
           <Box className='px-2 pt-5 pb-2' >
             {/* <Link to="/"> */}
-              <Button onClick={logout} fullWidth variant={hovered ? "contained" : "outlined"} onMouseEnter={() => setHovered(true)}
+              <Button onClick={trial} fullWidth variant={hovered ? "contained" : "outlined"} onMouseEnter={() => setHovered(true)}
               onMouseLeave={() => setHovered(false)} color="primary">
                 Logout
               </Button>

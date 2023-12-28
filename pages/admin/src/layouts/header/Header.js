@@ -6,11 +6,11 @@ import PropTypes from "prop-types";
 import SearchDD from "./SearchDD";
 import ProfileDD from "./ProfileDD";
 
-const Header = ({ sx, customClass, toggleMobileSidebar, position ,logout}) => {
+const Header = ({ sx, customClass, toggleMobileSidebar, position ,logout, anymsg}) => {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
- 
+  
     const datafetcher = async () => {
       if (localStorage.getItem("token")) {
         let data = { token: localStorage.getItem("token") };
@@ -63,7 +63,7 @@ const Header = ({ sx, customClass, toggleMobileSidebar, position ,logout}) => {
 
         {/* ------------------------------------------- */}
         {/* Profile Dropdown */}
-        <ProfileDD user={username} logout={logout}/>
+        <ProfileDD user={username} logout={logout} anymsg={anymsg}/>
         {/* ------------------------------------------- */}
       </Toolbar>
     </AppBar>

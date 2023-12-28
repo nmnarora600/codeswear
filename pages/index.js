@@ -23,7 +23,7 @@ export default function Home() {
   <div className="container px-5 py-24 mx-auto">
     <div className="flex flex-wrap w-full mb-20 flex-col items-center text-center">
       <h1 className="sm:text-3xl text-2xl md:text-4xl font-medium title-font mb-2 text-gray-900">Wear The Code with Codeswear</h1>
-      <p className="lg:w-2/3 mt-3 w-full leading-relaxed text-gray-500">Wear whatever you want? What do you want? You want code? so why not wear the code??? Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quisquam ducimus non modi sed dolorum voluptatem, reiciendis sint assumenda itaque fuga reprehenderit error harum, amet eveniet quo. Excepturi enim beatae, quisquam facilis iure dolorum laboriosam unde sint, nobis, nihil laudantium ut maxime inventore aliquid dolor ipsam distinctio culpa. Fugiat molestiae dolorum modi vitae non aliquam. </p>
+      <p className="lg:w-2/3 mt-3 w-full leading-relaxed text-gray-500"> Welcome to Codeswear.com, where coding meets fashion! Explore our curated collection of T-shirts, hoodies, and zippers designed for coders. From witty programming jokes to stylish code snippets on mugs, we've got something for every tech enthusiast. Join the Codeswear community and let your wardrobe speak the language of code with comfort and style. </p>
     </div>
     <div className="flex flex-wrap -m-4">
       <div className="xl:w-1/3 md:w-1/2 p-4">

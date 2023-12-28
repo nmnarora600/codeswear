@@ -12,10 +12,10 @@ import Order from "@/models/Order";
 import { useEffect,useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-export default function Index({o, monthlySale, logout}) {
+export default function Index({o, monthlySale, logout, anymsg}) {
 
   const router=useRouter();
-  
+
   const [admin, setAdmin] = useState(false)
   useEffect(() => {
    
@@ -71,7 +71,7 @@ export default function Index({o, monthlySale, logout}) {
       <Head>
         <title>Dashboard - Codeswear Admin</title>
       </Head>
-        <FullLayout logout={logout} >
+        <FullLayout logout={logout} anymsg={anymsg} >
           
     <Grid container spacing={0}>
       <Grid item xs={12} lg={12}>
